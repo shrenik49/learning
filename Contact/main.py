@@ -1,23 +1,35 @@
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 contacts = {}
 
 def add_contact():
     name = input("Enter name: ")
     number = input("Enter mobile number: ")
     contacts[name]=number
-    print("Added contact for {} successfully".format(name))
+    print(bcolors.OKGREEN + "Added contact for {} successfully!".format(name)+ bcolors.ENDC)
 
 def view_all_contacts():
     if len(contacts)==0:
-        print("No contact to show .Please add contacts")
+        print("No contact to show. Please add contacts!")
     else:
+        print("Contact List:")
         for name ,number in contacts.items():
             print("{} : {}".format(name,number))
-
+        print("Total {} contact(s)...".format(len(contacts)))
 def delete_contact():
     name = input("Enter name to delete: ")
     try:
         del contacts[name]
-        print("Deleted contact for {} successfully".format(name))
+        print("Deleted contact for {} successfully!".format(name))
     except KeyError:
         print("Please enter valid name to delete.")
  
@@ -26,9 +38,9 @@ def update_contact():
     newNumber = input("Enter new number for contact with {}.".format(name))
     if contacts[name] :
         contacts[name]=newNumber
-        print("Updated contact for {} successfully".format(name))
+        print("Updated contact for {} successfully!".format(name))
     else:
-        print("Contact not available for this name")
+        print("Contact not available for this name.")
         
 def search_contact():
     name = input("Enter name to search contact: ")
@@ -46,6 +58,7 @@ while True:
     print("5. Search contact by name")
     print("6. Exit")
     choice = input("Enter your choice: ")
+    print("--------------- Output ---------------")
     if choice == '1':
         add_contact()
     elif choice == '4':
@@ -61,3 +74,4 @@ while True:
         break
     else:
         print("Invalid choice. Please enter a number between 1 and 6.")
+    print("--------------------------------------")
