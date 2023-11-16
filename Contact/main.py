@@ -1,3 +1,15 @@
+import sqlite3
+conn = sqlite3.connect('contacts.db')
+cursor = conn.cursor()
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS contacts (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        phone_number TEXT
+    )
+''')
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -14,60 +26,68 @@ def add_contact():
     name = input(bcolors.BOLD+"Enter name: "+bcolors.ENDC)
     number = input(bcolors.BOLD+"Enter mobile number: "+bcolors.ENDC)
     if(len(number)==10):
-        contacts[name]=number
+        cursor.execute('''INSERT INTO contacts(
+            name, phone_number) VALUES 
+            (?,?)''',(name,number))
         print(bcolors.OKGREEN + "Added contact for {} successfully!".format(name)+ bcolors.ENDC)
     else:
         print(bcolors.WARNING + "Please enter valid 10 digit number"+bcolors.ENDC)
 
 def view_all_contacts():
+    cursor.execute('''SELECT * FROM contacts''')
+    contacts=cursor.fetchall()
     if len(contacts)==0:
         print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
     else:
-        print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
-        for name ,number in contacts.items():
-            print(bcolors.OKBLUE+"{} : {}".format(name,number)+ bcolors.ENDC)
-        print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
+        for row in contacts:
+            print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
+            print(bcolors.OKBLUE+"{} : {} {}".format(row[0],row[1],row[2])+ bcolors.ENDC)
+            print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
 
 def delete_contact():
-    name = input(bcolors.BOLD+"Enter name to delete: "+bcolors.ENDC)
-    try:
-        del contacts[name]
+    cursor.execute('''SELECT * FROM contacts''')
+    contacts=cursor.fetchall()
+    if len(contacts)==0:
+        print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
+    else:
+        name = input(bcolors.BOLD+"Enter name to delete: "+bcolors.ENDC)
+        cursor.execute('''DELETE FROM contacts where name = (?)''',(name,))
+        conn.commit()
         print(bcolors.WARNING+"Deleted contact for {} successfully!".format(name)+bcolors.ENDC)
-    except KeyError:
-        print(bcolors.WARNING+"Please enter valid name to delete."+bcolors.ENDC)
  
 def update_contact():
     name = input(bcolors.BOLD+"Enter name to update contact: "+bcolors.ENDC)
     newNumber = input(bcolors.BOLD+"Enter new number for contact with {}.".format(name)+bcolors.ENDC)
-    if name in contacts :
-        if len(newNumber)== 10:
-            contacts[name]=newNumber
-            print(bcolors.OKBLUE+"Updated contact for {} successfully!".format(name)+bcolors.ENDC)
-        else:
-            print(bcolors.WARNING + "Please enter valid 10 digit number"+bcolors.ENDC)
+    if len(newNumber)==10:
+        cursor.execute('''UPDATE contacts set phone_number = (?) where name=(?)''',(newNumber,name))
+        conn.commit()
+        print(bcolors.OKBLUE+"Updated contact for {} successfully!".format(name)+bcolors.ENDC)
     else:
         print(bcolors.WARNING+"Contact not available for this name."+bcolors.ENDC)
-        
+
 def search_contact():
+    name = input(bcolors.BOLD+"Enter name to update contact: "+bcolors.ENDC)
+    cursor.execute('''SELECT * FROM contacts where name = ?''',(name,))
+    contacts=cursor.fetchall()
     if len(contacts)==0:
         print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
     else:
-        name = input(bcolors.BOLD+"Enter name to search contact: "+bcolors.ENDC)
-        if name in contacts:
-            print(bcolors.OKBLUE+"{}:{}".format(name,contacts[name])+bcolors.ENDC)
-        else:
-            print(bcolors.WARNING+"Contact not available for this name."+bcolors.ENDC)
+        for row in contacts:
+            print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
+            print(bcolors.OKBLUE+"{} : {} {}".format(row[0],row[1],row[2])+ bcolors.ENDC)
+            print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
 
 def search_contact_bynumber():
     number = input(bcolors.BOLD+"Enter number to search contact: "+bcolors.ENDC)
-    flag=0
-    for name,phone in contacts.items():
-        if number == phone:
-            print(bcolors.OKBLUE+"{}:{}".format(name,phone)+bcolors.ENDC)
-            flag=1
-            break
-    if flag==0:
-        print(bcolors.WARNING+"Contact not available for this name."+bcolors.ENDC)
+    cursor.execute('''SELECT * FROM contacts where phone_number = ?''',(number,))
+    contacts=cursor.fetchall()
+    if len(contacts)==0:
+        print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
+    else:
+        for row in contacts:
+            print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
+            print(bcolors.OKBLUE+"{} : {} {}".format(row[0],row[1],row[2])+ bcolors.ENDC)
+            print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
         
 
 while True:
