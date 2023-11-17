@@ -1,3 +1,4 @@
+from db import SELECT_ALL_CONTACTS,SELECT_CONTACT_BY_NAME,SELECT_CONTACT_BY_NUMBER,INSERT_INTO_TABLE , UPDATE_TABLE ,DELETE_FROM_TABLE
 import sqlite3
 conn = sqlite3.connect('contacts.db')
 cursor = conn.cursor()
@@ -26,32 +27,33 @@ def add_contact():
     name = input(bcolors.BOLD+"Enter name: "+bcolors.ENDC)
     number = input(bcolors.BOLD+"Enter mobile number: "+bcolors.ENDC)
     if(len(number)==10):
-        cursor.execute('''INSERT INTO contacts(
-            name, phone_number) VALUES 
-            (?,?)''',(name,number))
+        cursor.execute(INSERT_INTO_TABLE,(name,number))
+        conn.commit()
         print(bcolors.OKGREEN + "Added contact for {} successfully!".format(name)+ bcolors.ENDC)
     else:
         print(bcolors.WARNING + "Please enter valid 10 digit number"+bcolors.ENDC)
 
 def view_all_contacts():
-    cursor.execute('''SELECT * FROM contacts''')
+    cursor.execute(SELECT_ALL_CONTACTS)
     contacts=cursor.fetchall()
+    conn.commit()
     if len(contacts)==0:
         print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
     else:
+        print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
         for row in contacts:
-            print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
             print(bcolors.OKBLUE+"{} : {} {}".format(row[0],row[1],row[2])+ bcolors.ENDC)
-            print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
+        print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
 
 def delete_contact():
-    cursor.execute('''SELECT * FROM contacts''')
+    cursor.execute(SELECT_ALL_CONTACTS)
     contacts=cursor.fetchall()
+    conn.commit()
     if len(contacts)==0:
         print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
     else:
         name = input(bcolors.BOLD+"Enter name to delete: "+bcolors.ENDC)
-        cursor.execute('''DELETE FROM contacts where name = (?)''',(name,))
+        cursor.execute(DELETE_FROM_TABLE,(name,))
         conn.commit()
         print(bcolors.WARNING+"Deleted contact for {} successfully!".format(name)+bcolors.ENDC)
  
@@ -59,35 +61,37 @@ def update_contact():
     name = input(bcolors.BOLD+"Enter name to update contact: "+bcolors.ENDC)
     newNumber = input(bcolors.BOLD+"Enter new number for contact with {}.".format(name)+bcolors.ENDC)
     if len(newNumber)==10:
-        cursor.execute('''UPDATE contacts set phone_number = (?) where name=(?)''',(newNumber,name))
+        cursor.execute(UPDATE_TABLE,(newNumber,name))
         conn.commit()
         print(bcolors.OKBLUE+"Updated contact for {} successfully!".format(name)+bcolors.ENDC)
     else:
         print(bcolors.WARNING+"Contact not available for this name."+bcolors.ENDC)
 
 def search_contact():
-    name = input(bcolors.BOLD+"Enter name to update contact: "+bcolors.ENDC)
-    cursor.execute('''SELECT * FROM contacts where name = ?''',(name,))
+    name = input(bcolors.BOLD+"Enter name to search contact: "+bcolors.ENDC)
+    cursor.execute(SELECT_CONTACT_BY_NAME,(name,))
     contacts=cursor.fetchall()
+    conn.commit()
     if len(contacts)==0:
         print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
     else:
+        print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
         for row in contacts:
-            print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
             print(bcolors.OKBLUE+"{} : {} {}".format(row[0],row[1],row[2])+ bcolors.ENDC)
-            print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
+        print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
 
 def search_contact_bynumber():
     number = input(bcolors.BOLD+"Enter number to search contact: "+bcolors.ENDC)
-    cursor.execute('''SELECT * FROM contacts where phone_number = ?''',(number,))
+    cursor.execute(SELECT_CONTACT_BY_NUMBER,(number,))
     contacts=cursor.fetchall()
+    conn.commit()
     if len(contacts)==0:
         print(bcolors.WARNING+"No contact to show. Please add contacts!"+bcolors.ENDC)
     else:
+        print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
         for row in contacts:
-            print(bcolors.BOLD+"Contact List:"+bcolors.ENDC)
             print(bcolors.OKBLUE+"{} : {} {}".format(row[0],row[1],row[2])+ bcolors.ENDC)
-            print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
+        print(bcolors.UNDERLINE+"Total {} contact(s)...".format(len(contacts))+bcolors.ENDC)
         
 
 while True:
